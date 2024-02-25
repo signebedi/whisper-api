@@ -20,7 +20,7 @@ if not env == 'testing':
         load_dotenv(env_file_path)
 
     else:
-        print("Error: env file not found. Did you run 'gita-init config'?")
+        print("Error: env file not found. Did you run 'app-init config'?")
         exit(1)
 
 else: env_file_path=""
@@ -29,8 +29,9 @@ class Config(object):
     ENVIRONMENT = env
     CONFIG_FILE_PATH = env_file_path
     SITE_NAME = os.getenv('SITE_NAME', 'Whisper STT API')
+    SITE_SOURCE_URL = os.getenv('SITE_SOURCE_URL', 'https://github.com/signebedi/whisper-api')
     HOMEPAGE_CONTENT = Markup(os.getenv('HOMEPAGE_CONTENT', ''))
-    PRIVACY_MESSAGE = Markup(os.getenv('PRIVACY_MESSAGE', '<p>This site may collect a limited amount of information about its users strictly to facilitate authentication and minimize the risk of abuse of the web interface and the application programming interface (API). Specifically, users are asked to register an account to help us understand usage trends, prevent abuse of the API, and meet generally-accepted best practices for API design. Beyond your email, we will not ask you for any personal information, nor provide any of this information to commercial third parties. To minimize the risk of cyber attack, we may collect summary data regarding the source IP of end user API requests. For more information about the application, see the source code at <a href="https://github.com/signebedi/gita-api">https://github.com/signebedi/whisper-api</a>.</p>'))
+    PRIVACY_MESSAGE = Markup(os.getenv('PRIVACY_MESSAGE', '<p>This site may collect a limited amount of information about its users strictly to facilitate authentication and minimize the risk of abuse of the web interface and the application programming interface (API). Specifically, users are asked to register an account to help us understand usage trends, prevent abuse of the API, and meet generally-accepted best practices for API design. Beyond your email, we will not ask you for any personal information, nor provide any of this information to commercial third parties. To minimize the risk of cyber attack, we may collect summary data regarding the source IP of end user API requests. For more information about the application, see the source code at <a href="https://github.com/signebedi/whisper-api">https://github.com/signebedi/whisper-api</a>.</p>'))
     DOMAIN = os.getenv('DOMAIN', 'http://127.0.0.1:5000')
     DEBUG = os.getenv('DEBUG', 'False') == 'True'
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecret_dev_key')

@@ -1,0 +1,104 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}
+Audio Recorder
+{% endblock %}
+
+{% block content %}
+<h1>Record Your Audio</h1>
+<p>Click "Start Recording" to begin and "Stop Recording" to end. You can then play back and upload your recording.</p>
+
+<!-- Audio controls for playback -->
+<audio id="playback" controls style="display:none;"></audio>
+
+<div class="controls">
+    <button id="startRecording" class="btn btn-primary">Start Recording</button>
+    <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
+</div>
+
+<form id="uploadForm" style="display:none;">
+    <input type="submit" class="btn btn-success" value="Upload Recording">
+</form>
+
+<div id="statusMessage"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startButton = document.getElementById('startRecording');
+    const stopButton = document.getElementById('stopRecording');
+    const playbackAudio = document.getElementById('playback');
+    const uploadForm = document.getElementById('uploadForm');
+    const statusMessage = document.getElementById('statusMessage');
+    let mediaRecorder;
+    let audioChunks = [];
+
+    startButton.addEventListener('click', () => {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                audioChunks = [];
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                playbackAudio.style.display = 'none';
+                statusMessage.textContent = 'Recording...';
+
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    audioChunks.push(event.data);
+                });
+
+                // Add headers to the fetch request
+                const headers = new Headers({
+                    'X-API-KEY': '{{ current_user.api_key }}'
+                });
+
+                mediaRecorder.addEventListener('stop', () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    playbackAudio.src = audioUrl;
+                    playbackAudio.style.display = 'block';
+                    uploadForm.style.display = 'block';
+                    statusMessage.textContent = '';
+                    // Prepare the form data to be uploaded
+                    uploadForm.onsubmit = function(e) {
+                        e.preventDefault();
+                        const formData = new FormData();
+                        formData.append('audio', audioBlob);
+                        fetch('/api/transcribe', { // Ensure this matches your Flask route
+                            headers: headers,
+                            method: 'POST',
+                            body: formData,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // statusMessage.textContent = 'Upload successful!';
+                            // Check if the data contains the transcription result
+                            if (data.content && data.content.full_text_timestamped) {
+                                statusMessage.innerHTML = `<strong>Transcription:</strong><br>${data.content.full_text}`;
+                                statusMessage.style.display = 'block'; // Make sure to display the div if it was hidden
+                            } else {
+                                statusMessage.textContent = 'Transcription failed or no transcription available.';
+                                statusMessage.style.display = 'block';
+                            }
+                            console.log(data); // Handle the response data
+                        })
+                        .catch(error => {
+                            statusMessage.textContent = 'Upload failed.';
+                            console.error(error);
+                        });
+                    };
+                });
+            })
+            .catch(error => console.error(error));
+    });
+
+    stopButton.addEventListener('click', () => {
+        mediaRecorder.stop();
+        startButton.disabled = false;
+        stopButton.disabled = true;
+    });
+});
+</script>
+{% endblock %}
