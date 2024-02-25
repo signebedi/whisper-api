@@ -17,7 +17,8 @@ Audio Recorder
 </div>
 
 <form id="uploadForm" style="display:none;">
-    <input type="submit" class="btn btn-success" value="Upload Recording">
+    <input type="submit" class="btn btn-success" id="submitButton" value="Upload Recording">
+    <div class="spinner-border spinner-border-sm loading-circle" role="status" style="display: none;"></div>
 </form>
 
 <div id="statusMessage"></div>
@@ -64,6 +65,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Prepare the form data to be uploaded
                     uploadForm.onsubmit = function(e) {
                         e.preventDefault();
+
+                        const submitButton = document.getElementById('submitButton');
+                        const startRecording = document.getElementById('startRecording');
+                        const stopRecording = document.getElementById('stopRecording');
+                        const spinner = document.querySelector('.loading-circle');
+                    
+                        submitButton.disabled = true;  // Disable the submit button
+                        startRecording.disabled = true;  // Disable the submit button
+                        stopRecording.disabled = true;  // Disable the submit button
+                        submitButton.innerText = 'Loading...';  // Change submit button text to 'Loading...'
+                        spinner.style.display = ''; // Show the spinner
+
                         const formData = new FormData();
                         formData.append('audio', audioBlob);
                         fetch('/api/transcribe', { // Ensure this matches your Flask route
@@ -87,6 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         .catch(error => {
                             statusMessage.textContent = 'Upload failed.';
                             console.error(error);
+                        })
+                        .finally(() => {
+                            submitButton.disabled = false;  // Re-enable the button
+                            startRecording.disabled = false;  // Re-enable the button
+                            stopRecording.disabled = false;  // Re-enable the button
+
+                            submitButton.innerText = 'Submit';  // Change button text back to 'Submit'
+                            spinner.style.display = 'none'; // Hide the spinner
                         });
                     };
                 });
