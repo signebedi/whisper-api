@@ -1,5 +1,5 @@
 celery<6.0.0
-faster-whisper<2.0.0
+faster-whisper<1.0.0
 Flask<4.0.0
 flask-hcaptcha<1.0.0
 Flask-Login<1.0.0
