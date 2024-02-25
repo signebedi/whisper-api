@@ -12,16 +12,25 @@ Audio Recorder
 <audio id="playback" controls style="display:none;"></audio>
 
 <div class="controls">
-    <button id="startRecording" class="btn btn-primary">Start Recording</button>
-    <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
+
+    <fieldset style="padding-top: 20px;" class="form-group">
+        <button id="startRecording" class="btn btn-primary">Start Recording</button>
+    </fieldset>
+    <fieldset style="padding-top: 20px;" class="form-group">
+        <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
+    </fieldset>
+
 </div>
 
 <form id="uploadForm" style="display:none;">
-    <input type="submit" class="btn btn-success" id="submitButton" value="Upload Recording">
-    <div class="spinner-border spinner-border-sm loading-circle" role="status" style="display: none;"></div>
+    <fieldset style="padding-top: 20px;" class="form-group">
+        <!-- <input type="submit" class="btn btn-success" id="submitButton" value="Upload Recording"> -->
+        <button type="submit" class="btn btn-success" id="submitButton">Submit</button>
+        <div class="spinner-border spinner-border-sm loading-circle" role="status" style="display: none;"></div>
+    </fieldset>
 </form>
 
-<div id="statusMessage"></div>
+<div id="statusMessage" class="container mt-5 results-div"></div>
 {% endblock %}
 
 {% block scripts %}
