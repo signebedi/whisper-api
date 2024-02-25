@@ -6,7 +6,7 @@ Audio Recorder
 
 {% block content %}
 <h1>Record Your Audio</h1>
-<p>Click "Start Recording" to begin and "Stop Recording" to end. You can then play back and upload your recording.</p>
+<p>Click "Start Recording" to begin and "Stop Recording" to end. You can then play back and submit your recording for transcription.</p>
 
 <!-- Audio controls for playback -->
 <audio id="playback" controls style="display:none;"></audio>
@@ -24,7 +24,6 @@ Audio Recorder
 
 <form id="uploadForm" style="display:none;">
     <fieldset style="padding-top: 20px;" class="form-group">
-        <!-- <input type="submit" class="btn btn-success" id="submitButton" value="Upload Recording"> -->
         <button type="submit" class="btn btn-success" id="submitButton">Submit</button>
         <div class="spinner-border spinner-border-sm loading-circle" role="status" style="display: none;"></div>
     </fieldset>
@@ -98,7 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             // statusMessage.textContent = 'Upload successful!';
                             // Check if the data contains the transcription result
                             if (data.content && data.content.full_text_timestamped) {
-                                statusMessage.innerHTML = `<strong>Transcription:</strong><br>${data.content.full_text}`;
+                                // statusMessage.innerHTML = `<p class="lead mb-3"><span class="badge bg-secondary" id="text-entry" onclick="copyToClipboard(this.parentNode)">Transcription:</span> ${data.content.full_text}</p>`;
+                                statusMessage.innerHTML = `<h4>Transcription:</h4><p class="lead mb-3" onclick="copyToClipboard(this)">${data.content.full_text}</p>`;
                                 statusMessage.style.display = 'block'; // Make sure to display the div if it was hidden
                             } else {
                                 statusMessage.textContent = 'Transcription failed or no transcription available.';
@@ -130,5 +130,35 @@ document.addEventListener('DOMContentLoaded', function() {
         stopButton.disabled = true;
     });
 });
+
+
+function copyToClipboard(element) {
+    // Copying to clipboard
+    var text = element.innerText; // Get the text of the entire paragraph
+    var elem = document.createElement("textarea");
+    document.body.appendChild(elem);
+    elem.value = text;
+    elem.select();
+    document.execCommand("copy");
+    document.body.removeChild(elem);
+
+    // Find the badge element (reference ID) within the paragraph
+    // var badge = element.querySelector('.badge');
+
+    // Tooltip activation
+    var tooltip = new bootstrap.Tooltip(element, {
+        title: "Copied!",
+        trigger: "manual" 
+    });
+
+    tooltip.show(); // Show the tooltip
+
+    // Hide tooltip after 2 seconds
+    setTimeout(function() {
+        tooltip.hide();
+    }, 2000);
+}
+
+
 </script>
 {% endblock %}
