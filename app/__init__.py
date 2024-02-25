@@ -64,7 +64,14 @@ from utils.smtp import Mailer
 from utils.celery import make_celery
 from utils.scripts import check_configuration_assumptions
 from utils.custom_sqlalchemy import SQLAlchemy
-from faster_whisper import WhisperModel
+
+from fw import (
+    WHISPER_RETAIN_AUDIO,
+    WHISPER_MODEL_SIZE,
+    WHISPER_DEVICE,
+    WHISPER_COMPUTE_TYPE,
+    transcribe_audio,
+)
 
 __version__ = "1.0.0"
 __name__ = "app"
@@ -76,7 +83,6 @@ __email__ = "signe@atreeus.com"
 
 
 app = Flask(__name__)
-# app.static_folder = "static/"
 
 env = os.environ.get('FLASK_ENV', 'development')
 if env == 'production':
@@ -85,6 +91,13 @@ elif env == 'testing':
     app.config.from_object(TestingConfig)
 else:
     app.config.from_object(DevelopmentConfig)
+
+
+# Set whisper specfic configs
+app.config['WHISPER_RETAIN_AUDIO'] = WHISPER_RETAIN_AUDIO
+app.config['WHISPER_MODEL_SIZE'] = WHISPER_MODEL_SIZE
+app.config['WHISPER_DEVICE'] = WHISPER_DEVICE
+app.config['WHISPER_COMPUTE_TYPE'] = WHISPER_COMPUTE_TYPE
 
 if app.config['DEBUG']:
     print(app.config)
@@ -910,56 +923,6 @@ def fuzzy():
                             **standard_view_kwargs()
                             )
 
-
-# Here, we manually set the app to not retain the user audio
-app.config['WHISPER_RETAIN_AUDIO'] = False
-app.config['WHISPER_MODEL_SIZE'] = "medium"
-
-def transcribe_audio(filepath:str, model_size=app.config['WHISPER_MODEL_SIZE'], device="cpu", compute_type="int8", language="en", beam_size=5, word_timestamps=True):
-
-        # Initialize WhisperModel
-        model = WhisperModel(model_size, device=device, compute_type=compute_type)
-
-        # or run on GPU with INT8
-        # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
-        # or run on CPU with INT8
-        # model = WhisperModel(model_size, device="cpu", compute_type="int8")
-
-        segments, info = model.transcribe(filepath, language=language, beam_size=beam_size, word_timestamps=word_timestamps)
-
-        # print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
-
-        # for segment in segments:
-        #     print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
-
-        se = [s for s in segments]
-
-        # # Initialize a new list to hold items without consecutive duplicates
-        # filtered_list = []
-
-        # # Iterate over the filtered list and add items to the new list if they do not have the same text as the previous item
-        # previous_text = [] 
-
-        # for s in se:
-        #     if s.text not in previous_text: 
-        #         filtered_list.append(s)
-
-        #     previous_text.append(str(s.text))
-        filtered_list = se
-
-        # Now, use `filtered_list` for further operations instead of `filtered_list`
-        full_text_timestamped = " ".join([f"[{s.start}] {s.text}" for s in filtered_list])
-        full_text = " ".join([str(s.text) for s in filtered_list])
-        sections = [{"start": str(s.start), "end": str(s.end), "text": str(s.text)} for s in filtered_list]
-
-        # Your dictionary now uses the list without consecutive duplicates
-        text_dict = {
-                "full_text_timestamped": full_text_timestamped,
-                "full_text": full_text,
-                "sections": sections,
-        }
-
-        return text_dict
 
 @app.route('/api/transcribe', methods=['POST'])
 def api_transcript():
