@@ -67,6 +67,7 @@ from utils.custom_sqlalchemy import SQLAlchemy
 
 from fw import (
     WHISPER_RETAIN_AUDIO,
+    WHISPER_RETAIN_TRANSCRIBED_TEXT,
     WHISPER_MODEL_SIZE,
     WHISPER_DEVICE,
     WHISPER_COMPUTE_TYPE,
