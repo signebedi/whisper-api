@@ -981,6 +981,48 @@ def history():
                             **standard_view_kwargs()
                             )
 
+@app.route('/api/send_mail', methods=['POST'])
+def api_email_result():
+
+    if not app.config["SMTP_ENABLED"]:
+        return abort(404)
+
+    signature = request.headers.get('X-API-KEY', None)
+    if not signature:
+        return jsonify({'error': 'No API key provided'}), 401
+
+    try:
+        valid = signatures.verify_key(signature, scope=["api_key"]) # if not app.config['TESTING'] else True
+
+    except RateLimitExceeded:
+        return jsonify({'error': 'Rate limit exceeded'}), 429
+
+    except KeyDoesNotExist:
+        return jsonify({'error': 'Invalid API key'}), 401
+
+    except KeyExpired:
+        return jsonify({'error': 'API key expired'}), 401
+
+    user = User.query.filter_by(api_key=signature).first()
+    if not user:
+        return jsonify({'error': 'No valid user account registered for this API key'}), 401
+
+    text = request.json['text']
+    if not text:
+        return jsonify({"error": "No text was provided"}), 400
+
+    timestamp = datetime.utcnow()
+    subject = f"{app.config['SITE_NAME']} transcribed data {timestamp}"
+
+    # Send email, asynchronously only if celery is enabled
+    if app.config['SMTP_ENABLED']:
+        if app.config['CELERY_ENABLED']:
+            send_email_async.delay(subject=subject, content=text, to_address=user.email)
+        else:
+            mailer.send_mail(subject=subject, content=text, to_address=user.email)
+    
+    return jsonify({'result': "sucess"}), 200
+
 
 @app.route('/api/transcribe', methods=['POST'])
 def api_transcript():
@@ -1002,7 +1044,7 @@ def api_transcript():
         return jsonify({'error': 'API key expired'}), 401
 
     if 'audio' not in request.files:
-        return jsonify({"error": "No audio file was uploaded."}), 400
+        return jsonify({"error": "No audio file was uploaded"}), 400
     
     # Get the audio file
     audio_file = request.files['audio']

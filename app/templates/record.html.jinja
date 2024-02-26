@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 // statusMessage.innerHTML = `<p class="lead mb-3"><span class="badge bg-secondary" id="text-entry" onclick="copyToClipboard(this.parentNode)">Transcription:</span> ${data.content.full_text}</p>`;
                                 statusMessage.innerHTML += `<p class="lead mb-3">
                                     {% if config['SMTP_ENABLED'] %}
-                                    <a title="Email this to yourself" href="#">
+                                    <a title="Email this to yourself" href="#" onclick="sendEmailWithFetch(this.parentNode)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
                                             <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
                                         </svg>
@@ -176,6 +176,55 @@ function copyToClipboard(element) {
         tooltip.hide();
     }, 2000);
 }
+
+{% if config['SMTP_ENABLED'] %}
+
+async function sendEmailWithFetch(element) {
+    const url = '/api/send_mail';
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-API-KEY': '{{ current_user.api_key }}',
+    };
+    const emailContent = element.innerText;
+
+    const body = JSON.stringify({
+        text: emailContent,
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: body,
+        });
+
+        if (!response.ok) {
+            // If the server response is not ok (HTTP status code in the range 200–299),
+            // throw an error with the status
+            throw new Error('Network response was not ok. Status: ' + response.status);
+        }
+
+        const data = await response.json(); 
+
+        // Tooltip activation
+        var tooltip = new bootstrap.Tooltip(element, {
+            title: "Sent!",
+            trigger: "manual" 
+        });
+
+        tooltip.show(); // Show the tooltip
+
+        // Hide tooltip after 2 seconds
+        setTimeout(function() {
+            tooltip.hide();
+        }, 2000);
+
+        console.log(data);
+    } catch (error) {
+        console.error('There was a problem with your fetch operation:', error);
+    }
+}
+{% endif %}
 
 
 </script>
