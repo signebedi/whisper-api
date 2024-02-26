@@ -199,6 +199,7 @@ def standard_view_kwargs():
         "COLLECT_USAGE_STATISTICS": app.config["COLLECT_USAGE_STATISTICS"],
         "PRIVACY_MESSAGE": app.config["PRIVACY_MESSAGE"],
         "SITE_SOURCE_URL": app.config["SITE_SOURCE_URL"],
+        "SMTP_ENABLED": app.config['SMTP_ENABLED'],
     }
     kwargs['current_user'] = current_user
     kwargs['current_year'] = datetime.now().year
