@@ -29,6 +29,7 @@ Audio Recorder
     </fieldset>
 </form>
 
+<div id="statusHeader" class="container mt-5 results-div"></div>
 <div id="statusMessage" class="container mt-5 results-div"></div>
 {% endblock %}
 
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const playbackAudio = document.getElementById('playback');
     const uploadForm = document.getElementById('uploadForm');
     const statusMessage = document.getElementById('statusMessage');
+    const statusHeader = document.getElementById('statusHeader');
     let mediaRecorder;
     let audioChunks = [];
 
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 startButton.disabled = true;
                 stopButton.disabled = false;
                 playbackAudio.style.display = 'none';
-                statusMessage.textContent = 'Recording...';
+                statusHeader.innerHTML = '<h4>Recording...</h4>';
 
                 mediaRecorder.addEventListener('dataavailable', event => {
                     audioChunks.push(event.data);
@@ -69,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     playbackAudio.src = audioUrl;
                     playbackAudio.style.display = 'block';
                     uploadForm.style.display = 'block';
-                    statusMessage.textContent = '';
+                    statusHeader.innerHTML = '<h4>Transcriptions:</h4>';
                     // Prepare the form data to be uploaded
                     uploadForm.onsubmit = function(e) {
                         e.preventDefault();
@@ -84,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         stopRecording.disabled = true;  // Disable the submit button
                         submitButton.innerText = 'Loading...';  // Change submit button text to 'Loading...'
                         spinner.style.display = ''; // Show the spinner
+                        statusHeader.innerHTML = '<h4>Transcribing...</h4>';
 
                         const formData = new FormData();
                         formData.append('audio', audioBlob);
@@ -96,18 +99,31 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(data => {
                             // statusMessage.textContent = 'Upload successful!';
                             // Check if the data contains the transcription result
+                            statusHeader.innerHTML = '<h4>Transcriptions:</h4>';
                             if (data.content && data.content.full_text_timestamped) {
                                 // statusMessage.innerHTML = `<p class="lead mb-3"><span class="badge bg-secondary" id="text-entry" onclick="copyToClipboard(this.parentNode)">Transcription:</span> ${data.content.full_text}</p>`;
-                                statusMessage.innerHTML = `<h4>Transcription:</h4><p class="lead mb-3" onclick="copyToClipboard(this)">${data.content.full_text}</p>`;
+                                statusMessage.innerHTML += `<p class="lead mb-3">
+                                    <a href="#">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                                        </svg>
+                                    </a>
+                                    <a href="#" onclick="copyToClipboard(this.parentNode)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                                        </svg>
+                                    </a>
+                                    ${data.content.full_text}
+                                </p>`;
                                 statusMessage.style.display = 'block'; // Make sure to display the div if it was hidden
                             } else {
-                                statusMessage.textContent = 'Transcription failed or no transcription available.';
+                                statusHeader.innerHTML = 'Transcription failed or no transcription available.';
                                 statusMessage.style.display = 'block';
                             }
                             console.log(data); // Handle the response data
                         })
                         .catch(error => {
-                            statusMessage.textContent = 'Upload failed.';
+                            statusHeader.innerHTML = 'Upload failed.';
                             console.error(error);
                         })
                         .finally(() => {
@@ -137,7 +153,7 @@ function copyToClipboard(element) {
     var text = element.innerText; // Get the text of the entire paragraph
     var elem = document.createElement("textarea");
     document.body.appendChild(elem);
-    elem.value = text;
+    elem.value = text.trim();
     elem.select();
     document.execCommand("copy");
     document.body.removeChild(elem);

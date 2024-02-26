@@ -31,6 +31,7 @@ class Config(object):
     SITE_NAME = os.getenv('SITE_NAME', 'Whisper STT API')
     SITE_SOURCE_URL = os.getenv('SITE_SOURCE_URL', 'https://github.com/signebedi/whisper-api')
     HOMEPAGE_CONTENT = Markup(os.getenv('HOMEPAGE_CONTENT', '<p>This API provides users with programmatic and webpage-based access to the Whisper API. We ask you to register an account to help us understand usage trends, prevent abuse of the API, and meet generally-accepted best practices for API design. Beyond your email, we will not ask you for any personal information, nor provide any of this information to commercial third parties.</p>'))
+    PRIVACY_MESSAGE = Markup(os.getenv('PRIVACY_MESSAGE', '<p>This site may collect a limited amount of information about its users strictly to facilitate authentication and minimize the risk of abuse of the web interface and the application programming interface (API). Specifically, users are asked to register an account to help us understand usage trends, prevent abuse of the API, and meet generally-accepted best practices for API design. Beyond your email, we will not ask you for any personal information, nor provide any of this information to commercial third parties. To minimize the risk of cyber attack, we may collect summary data regarding the source IP of end user API requests.</p>'))
     DOMAIN = os.getenv('DOMAIN', 'http://127.0.0.1:5000')
     DEBUG = os.getenv('DEBUG', 'False') == 'True'
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecret_dev_key')
@@ -72,7 +73,7 @@ class Config(object):
     RATE_LIMITS_ENABLED = os.getenv('RATE_LIMITS_ENABLED', 'False') == 'True'
     # Rate limiting period should be an int corresponding to the number of minutes
     RATE_LIMITS_PERIOD = timedelta(minutes=int(os.getenv('RATE_LIMITS_PERIOD', 1)))
-    RATE_LIMITS_MAX_REQUESTS = int(os.getenv('RATE_LIMITS_MAX_REQUESTS', 10))
+    RATE_LIMITS_MAX_REQUESTS = int(os.getenv('RATE_LIMITS_MAX_REQUESTS', 3))
 
     # MAX_LOGIN_ATTEMPTS = lambda: default_get_max_login_attempts("False")
     MAX_LOGIN_ATTEMPTS = int(os.getenv('MAX_LOGIN_ATTEMPTS', "0"))
@@ -108,7 +109,7 @@ class ProductionConfig(Config):
     # Defaults to True / Enabled in production, with more stringent default settings
     RATE_LIMITS_ENABLED = os.getenv('RATE_LIMITS_ENABLED', 'True') == 'True'
     RATE_LIMITS_PERIOD = timedelta(minutes=int(os.getenv('RATE_LIMITS_PERIOD', 60)))
-    RATE_LIMITSSMTP_PASSWORD_MAX_REQUESTS = int(os.getenv('RATE_LIMITS_MAX_REQUESTS', 100))
+    RATE_LIMITSSMTP_PASSWORD_MAX_REQUESTS = int(os.getenv('RATE_LIMITS_MAX_REQUESTS', 20))
 
     # MAX_LOGIN_ATTEMPTS = lambda: default_get_max_login_attempts(5)
     MAX_LOGIN_ATTEMPTS = int(os.getenv('MAX_LOGIN_ATTEMPTS', "5")) 
