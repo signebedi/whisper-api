@@ -1,3 +1,9 @@
+""" 
+app/config.py: sets the general configs for a flask app with REST and UI
+Note: application-specific logic and configurations SHOULD come from a 
+separate source to help preserve the generalizability of this logic.
+"""
+
 import os, shutil
 from dotenv import (
     load_dotenv, 

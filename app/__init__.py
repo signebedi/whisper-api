@@ -96,6 +96,7 @@ else:
 
 # Set whisper specfic configs
 app.config['WHISPER_RETAIN_AUDIO'] = WHISPER_RETAIN_AUDIO
+app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT'] = WHISPER_RETAIN_TRANSCRIBED_TEXT
 app.config['WHISPER_MODEL_SIZE'] = WHISPER_MODEL_SIZE
 app.config['WHISPER_DEVICE'] = WHISPER_DEVICE
 app.config['WHISPER_COMPUTE_TYPE'] = WHISPER_COMPUTE_TYPE
@@ -170,6 +171,16 @@ class UsageLog(db.Model):
 
     user = db.relationship("User", back_populates="usage_log")
 
+# We create the TranscribedText table in all cases, though its usage depends on 
+# the WHISPER_RETAIN_TRANSCRIBED_TEXT configuration set in fw.
+class TranscribedText(db.Model):
+    __tablename__ = 'usage_log'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    text = db.Column(db.String, nullable=False)
+
+
 db.init_app(app=app)
 if app.config['DEBUG'] or app.config['TESTING']:
     with app.app_context():
@@ -234,6 +245,30 @@ if app.config['CELERY_ENABLED']:
     @celery.task
     def send_email_async(subject=None, content=None, to_address=None, cc_address_list=[]):
         return mailer.send_mail(subject=subject, content=content, to_address=to_address, cc_address_list=cc_address_list)
+
+    @celery.task
+    def save_transcribed_text_to_db(api_key, text):
+        user = User.query.filter_by(api_key=api_key).first()
+        if user:
+            transcribed_text = TranscribedText(
+                    user_id=current_user.id,
+                    text=result['full_text']
+                )
+            db.session.add(transcribed_text)
+
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                # Placeholder for logging logic
+
+        transcribed_text = TranscribedText(
+                    user_id=current_user.id,
+                    text=result['full_text']
+                )
+        db.session.add(transcribed_text)
+        db.session.commit()
+
 
 
     @celery.task
@@ -982,6 +1017,10 @@ def api_transcript():
 
         # Call our Celery task
         log_api_call.delay(signature, route_path, remote_addr=request.remote_addr)
+
+
+        if app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT']:
+            save_transcribed_text_to_db.delay(signature, text=result['full_text'])
 
 
     return jsonify({'content': result}), 200
