@@ -38,12 +38,9 @@
 
                     {% if current_user.is_authenticated %}
 
-                    {# <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('reference') }}">Reference Search</a>
-                    </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('fuzzy') }}">Fuzzy Search</a>
-                    </li> #}
+                        <a class="nav-link" href="{{ url_for('record') }}">Record Audio</a>
+                    </li> 
 
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>

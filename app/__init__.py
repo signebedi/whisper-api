@@ -918,7 +918,7 @@ def privacy():
 
 @app.route('/record', methods=['GET'])
 @login_required
-def fuzzy():
+def record():
     return render_template('record.html.jinja', 
                             **standard_view_kwargs()
                             )
