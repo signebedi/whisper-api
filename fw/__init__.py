@@ -3,7 +3,7 @@ from faster_whisper import WhisperModel
 # Here, we manually set the app to not retain the user audio. Eventually, we will want 
 # to override these with environment variables, and set these to default values. 
 WHISPER_RETAIN_AUDIO = False
-WHISPER_RETAIN_TRANSCRIBED_TEXT = False
+WHISPER_RETAIN_TRANSCRIBED_TEXT = True
 WHISPER_MODEL_SIZE = "medium"
 WHISPER_DEVICE="cpu"
 WHISPER_COMPUTE_TYPE="int8"

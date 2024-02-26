@@ -42,6 +42,12 @@
                         <a class="nav-link" href="{{ url_for('record') }}">Record Audio</a>
                     </li> 
 
+                    {% if show_transcriptions_history_link %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('history') }}">History</a>
+                    </li>
+                    {% endif %}
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
                     </li>

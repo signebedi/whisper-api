@@ -174,7 +174,7 @@ class UsageLog(db.Model):
 # We create the TranscribedText table in all cases, though its usage depends on 
 # the WHISPER_RETAIN_TRANSCRIBED_TEXT configuration set in fw.
 class TranscribedText(db.Model):
-    __tablename__ = 'usage_log'
+    __tablename__ = 'transcribed_text'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -214,6 +214,10 @@ def standard_view_kwargs():
     # navbar, see https://github.com/signebedi/gita-api/issues/13.
     kwargs['show_help_page_link'] = True if app.config["HELP_PAGE_ENABLED"] and app.config['SMTP_ENABLED'] else False
 
+    # This determines whether we show the navbar link to view the user's past
+    # transcriptions, see https://github.com/signebedi/whisper-api/issues/11. 
+    kwargs['show_transcriptions_history_link'] = True if app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT'] else False
+
     return kwargs
 
 
@@ -252,7 +256,7 @@ if app.config['CELERY_ENABLED']:
         if user:
             transcribed_text = TranscribedText(
                     user_id=current_user.id,
-                    text=result['full_text']
+                    text=text,
                 )
             db.session.add(transcribed_text)
 
@@ -950,12 +954,29 @@ def home():
 def privacy():
     return render_template('privacy.html.jinja', **standard_view_kwargs())
 
-
+##################################################
+### App-Specific Views
+##################################################
 
 @app.route('/record', methods=['GET'])
 @login_required
 def record():
     return render_template('record.html.jinja', 
+                            **standard_view_kwargs()
+                            )
+
+
+@app.route('/history', methods=['GET'])
+@login_required
+def history():
+
+    if not app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT']:
+        return abort(404)
+
+    transcriptions = TranscribedText.query.filter_by(user_id=current_user.id).all()
+
+    return render_template('history.html.jinja', 
+                            transcriptions=transcriptions,
                             **standard_view_kwargs()
                             )
 
@@ -1021,7 +1042,22 @@ def api_transcript():
 
         if app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT']:
             save_transcribed_text_to_db.delay(signature, text=result['full_text'])
+    else:
+        # Run synchronously if celery is not enabled...
+        if app.config['WHISPER_RETAIN_TRANSCRIBED_TEXT']:
 
+            user = User.query.filter_by(api_key=signature).first()
+            if user:
+                transcribed_text = TranscribedText(
+                        user_id=current_user.id,
+                        text=result['full_text']
+                    )
+                db.session.add(transcribed_text)
+
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
 
     return jsonify({'content': result}), 200
 
