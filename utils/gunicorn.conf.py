@@ -2,8 +2,11 @@ import os
 
 
 def pre_fork(server, worker):
-    from app import app, db 
 
+    # Ideally, this will suffice to initialize the models we want to use
+    from fw import model
+
+    from app import app, db
     with app.app_context():
         # SQLAlchemy's create_all is idempotent and typically doesn't recreate
         # tables that already exist. However, when run in a post-fork environment
