@@ -8,16 +8,31 @@ Audio Recorder
 <h1>Record Your Audio</h1>
 <p>Click "Start Recording" to begin and "Stop Recording" to end. You can then play back and submit your recording for transcription.</p>
 
-<!-- Audio controls for playback -->
-<audio id="playback" controls style="display:none;"></audio>
-
 <div class="controls">
 
     <fieldset style="padding-top: 20px;" class="form-group">
-        <button id="startRecording" class="btn btn-primary">Start Recording</button>
-    </fieldset>
-    <fieldset style="padding-top: 20px;" class="form-group">
-        <button id="stopRecording" class="btn btn-secondary" disabled>Stop Recording</button>
+        <button title="Start recording" id="startRecording" style="margin-left: 10px;" class="btn btn-outline-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+            </svg>
+        </button>
+        <button title="Stop recording" id="stopRecording" style="margin-left: 10px;" class="btn btn-outline-secondary" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16">
+                <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5"/>
+            </svg>
+        </button>
+        <button title="Download recording" style="display: none; margin-left: 10px;" class="btn btn-outline-secondary">
+            <a id="downloadRecording">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+            </a>
+        </button>
+
+        <!-- Audio controls for playback -->
+        <audio id="playback" controls style="display:none; margin-top: 20px;"></audio>
+
     </fieldset>
 
 </div>
@@ -66,12 +81,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 mediaRecorder.addEventListener('stop', () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                     const audioUrl = URL.createObjectURL(audioBlob);
                     playbackAudio.src = audioUrl;
                     playbackAudio.style.display = 'block';
                     uploadForm.style.display = 'block';
                     statusHeader.innerHTML = '<h4>Transcriptions:</h4>';
+
+                    const downloadLink = document.getElementById('downloadRecording');
+                    downloadLink.href = audioUrl;
+                    downloadLink.download = "recording.mp3";
+                    // Append the download link somewhere in your HTML, for example next to the playback audio element
+                    // playbackAudio.parentNode.insertBefore(downloadLink, playbackAudio.nextSibling);
+                    downloadLink.parentNode.style.display = 'inline-block';
+
+
                     // Prepare the form data to be uploaded
                     uploadForm.onsubmit = function(e) {
                         e.preventDefault();
