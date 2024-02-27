@@ -1,12 +1,13 @@
+import os
 from faster_whisper import WhisperModel
 
-# Here, we manually set the app to not retain the user audio. Eventually, we will want 
-# to override these with environment variables, and set these to default values. 
-WHISPER_RETAIN_AUDIO = False
-WHISPER_RETAIN_TRANSCRIBED_TEXT = True
-WHISPER_MODEL_SIZE = "medium"
-WHISPER_DEVICE="cpu"
-WHISPER_COMPUTE_TYPE="int8"
+# Here, we manually set the app to not retain the user audio. See 
+# discusstion at https://github.com/signebedi/whisper-api/issues/13. 
+WHISPER_RETAIN_AUDIO = os.getenv("WHISPER_RETAIN_AUDIO", "False") == "True"
+WHISPER_RETAIN_TRANSCRIBED_TEXT = os.getenv("WHISPER_RETAIN_TRANSCRIBED_TEXT", "True") == "True"
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "medium")
+WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
+WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 
 # Initialize WhisperModel. Eventually, we will want to have a special way to initialize this model.
 model = WhisperModel(WHISPER_MODEL_SIZE, device=WHISPER_DEVICE, compute_type=WHISPER_COMPUTE_TYPE)
