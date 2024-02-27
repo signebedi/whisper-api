@@ -256,7 +256,7 @@ if app.config['CELERY_ENABLED']:
         user = User.query.filter_by(api_key=api_key).first()
         if user:
             transcribed_text = TranscribedText(
-                    user_id=current_user.id,
+                    user_id=user.id,
                     text=text,
                 )
             db.session.add(transcribed_text)
@@ -1092,7 +1092,7 @@ def api_transcript():
             user = User.query.filter_by(api_key=signature).first()
             if user:
                 transcribed_text = TranscribedText(
-                        user_id=current_user.id,
+                        user_id=user.id,
                         text=result['full_text']
                     )
                 db.session.add(transcribed_text)
