@@ -967,6 +967,14 @@ def record():
                             )
 
 
+
+@app.route('/upload', methods=['GET'])
+@login_required
+def upload():
+    return render_template('upload.html.jinja', 
+                            **standard_view_kwargs()
+                            )
+
 @app.route('/history', methods=['GET'])
 @login_required
 def history():
