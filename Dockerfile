@@ -26,4 +26,4 @@ RUN touch /app/instance/dev.env
 EXPOSE 5000
 
 # Run flask run when the container launches
-CMD ["flask", "run"]
+CMD ["flask", "run", "--host", "0.0.0.0"]
