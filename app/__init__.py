@@ -52,6 +52,7 @@ from flask_login import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy import desc
 
 from app.config import (
     DevelopmentConfig, 
@@ -983,6 +984,10 @@ def history():
         return abort(404)
 
     transcriptions = TranscribedText.query.filter_by(user_id=current_user.id).all()
+    # transcriptions = TranscribedText.query.filter_by(user_id=current_user.id).order_by(
+    #     desc(TranscribedText.timestamp)
+    # ).all()
+
 
     return render_template('history.html.jinja', 
                             transcriptions=transcriptions,

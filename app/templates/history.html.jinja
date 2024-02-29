@@ -38,7 +38,8 @@ Past Transcriptions
 <script>
     $(document).ready( function () {
         $('#transcriptionsTable').DataTable({
-            "scrollX": true
+            "scrollX": true,
+            "aaSorting": [[ 0, "desc" ]] // Sort by first column descending https://stackoverflow.com/a/7878267/13301284
         });
     });
 </script>
