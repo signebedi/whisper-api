@@ -5,12 +5,17 @@ from faster_whisper import WhisperModel
 # discusstion at https://github.com/signebedi/whisper-api/issues/13. 
 WHISPER_RETAIN_AUDIO = os.getenv("WHISPER_RETAIN_AUDIO", "False") == "True"
 WHISPER_RETAIN_TRANSCRIBED_TEXT = os.getenv("WHISPER_RETAIN_TRANSCRIBED_TEXT", "True") == "True"
-WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "medium")
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "tiny")
 WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
 WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+WHISPER_LOCAL_FILES_ONLY = os.getenv("WHISPER_LOCAL_FILES_ONLY", "False") == "True"
 
 # Initialize WhisperModel. Eventually, we will want to have a special way to initialize this model.
-model = WhisperModel(WHISPER_MODEL_SIZE, device=WHISPER_DEVICE, compute_type=WHISPER_COMPUTE_TYPE)
+model = WhisperModel(WHISPER_MODEL_SIZE,
+        device=WHISPER_DEVICE, 
+        compute_type=WHISPER_COMPUTE_TYPE, 
+        local_files_only=WHISPER_LOCAL_FILES_ONLY
+)
 
 def transcribe_audio(filepath:str, language="en", beam_size=5, word_timestamps=True):
 

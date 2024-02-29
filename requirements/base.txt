@@ -4,10 +4,8 @@ Flask<4.0.0
 flask-hcaptcha<1.0.0
 Flask-Login<1.0.0
 flask-signing<1.0.0
-fuzzywuzzy<1.0.0
 gunicorn<22.0.0
 pandas<3.0.0
 plotly<6.0.0
 psycopg2-binary<3.0.0
 python-dotenv<2.0.0
-python-Levenshtein<1.0.0
