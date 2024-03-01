@@ -5,7 +5,7 @@ from faster_whisper import WhisperModel
 # discusstion at https://github.com/signebedi/whisper-api/issues/13. 
 WHISPER_RETAIN_AUDIO = os.getenv("WHISPER_RETAIN_AUDIO", "False") == "True"
 WHISPER_RETAIN_TRANSCRIBED_TEXT = os.getenv("WHISPER_RETAIN_TRANSCRIBED_TEXT", "True") == "True"
-WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "tiny")
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "medium.en")
 WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
 WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 WHISPER_LOCAL_FILES_ONLY = os.getenv("WHISPER_LOCAL_FILES_ONLY", "False") == "True"

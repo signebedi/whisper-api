@@ -2,7 +2,7 @@
 FROM python:3.8
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /
 
 COPY requirements/base.txt requirements.txt
 
@@ -12,15 +12,15 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create instance dir
-RUN mkdir -p /app/instance
+RUN mkdir -p /instance
 
 # Create a empty env files
-RUN touch /app/instance/prod.env
-RUN touch /app/instance/dev.env
+RUN touch /instance/prod.env
+RUN touch /instance/dev.env
 
 # Download model
-# RUN python3 /app/utils/download_model.py --output_dir /app/instance/ "medium.en"
-# ENV WHISPER_MODEL_SIZE=/app/instance/medium
+# RUN python -c "from fw import model"
+
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
