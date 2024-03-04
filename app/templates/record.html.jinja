@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             statusHeader.innerHTML = '<h4>Transcriptions:</h4>';
                             if (data.content && data.content.full_text_timestamped) {
                                 // statusMessage.innerHTML = `<p class="lead mb-3"><span class="badge bg-secondary" id="text-entry" onclick="copyToClipboard(this.parentNode)">Transcription:</span> ${data.content.full_text}</p>`;
-                                statusMessage.innerHTML += `<p class="lead mb-3">
+                                statusMessage.insertAdjacentHTML("afterbegin", `You: <p class="lead mb-3 msg left">
                                     {% if config['SMTP_ENABLED'] %}
                                     <a title="Email this to yourself" href="#" onclick="sendEmailWithFetch(this.parentNode)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </svg>
                                     </a>
                                     ${data.content.full_text}
-                                </p>`;
+                                </p>`);
                                 statusMessage.style.display = 'block'; // Make sure to display the div if it was hidden
                             } else {
                                 statusHeader.innerHTML = 'Transcription failed or no transcription available.';
