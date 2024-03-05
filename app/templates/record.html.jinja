@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 audioChunks = [];
                 startButton.disabled = true;
                 stopButton.disabled = false;
+                submitButton.disabled = true;
                 playbackAudio.style.display = 'none';
                 statusHeader.innerHTML = '<h4>Recording...</h4>';
 
@@ -81,6 +82,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 mediaRecorder.addEventListener('stop', () => {
+                    stopButton.disabled = true;
+                    submitButton.disabled = false;
+                    
                     const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                     const audioUrl = URL.createObjectURL(audioBlob);
                     playbackAudio.src = audioUrl;
@@ -155,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         .finally(() => {
                             submitButton.disabled = false;  // Re-enable the button
                             startRecording.disabled = false;  // Re-enable the button
-                            stopRecording.disabled = false;  // Re-enable the button
+                            // stopRecording.disabled = false;  // Re-enable the button
 
                             submitButton.innerText = 'Submit';  // Change button text back to 'Submit'
                             spinner.style.display = 'none'; // Hide the spinner
