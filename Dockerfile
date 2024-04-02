@@ -21,7 +21,6 @@ RUN touch /instance/dev.env
 # Download model
 # RUN python -c "from fw import model"
 
-
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 

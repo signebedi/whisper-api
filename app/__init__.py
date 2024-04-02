@@ -1065,11 +1065,11 @@ def api_transcript():
     # Decide whether to save permanently or as a temp file
     if app.config['WHISPER_RETAIN_AUDIO']:
         # Ensure the static/audio directory exists
-        save_dir = os.path.join(app.static_folder, "audio")
+        save_dir = os.path.join(os.getcwd(), 'instance', "audio") 
         os.makedirs(save_dir, exist_ok=True)
         
         # Save to the static/audio directory
-        filepath = os.path.join(save_dir, audio_file.filename)
+        filepath = os.path.join(save_dir, f"{datetime.now().strftime('%Y%m%d%H%M%S')}.mp3")
         audio_file.save(filepath)
 
         # Process the saved file
